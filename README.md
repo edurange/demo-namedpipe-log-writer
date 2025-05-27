@@ -1,2 +1,2 @@
 # demo-namedpipe-log-writer
-Demonstrates log reading/writing using a named pipe for concurrency without polling
+Demonstrates reading/writing (for something like a log) using a named pipe for concurrency without polling
