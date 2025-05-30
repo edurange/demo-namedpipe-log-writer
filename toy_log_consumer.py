@@ -11,7 +11,6 @@ import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime
 import sys
-import time
 
 __author__ = "Joe Granville"
 __date__ = "20250526"
@@ -27,7 +26,8 @@ async def asyncopen(path, mode):
     Asynchronously waits for a file to open, then closes it
     """
     print(f'Opening "{path}"')
-    file = await asyncio.to_thread(open, path, mode, encoding="utf-8")
+    file = await asyncio.to_thread(open, path, mode)
+    print("foo")
     yield file
     print(f'Closing "{path}"')
     file.close()
@@ -40,7 +40,7 @@ async def coroutineread(path):
     Needs to detect when other writers close the pipe, otherwise reads
     will stop blocking and return empty strings indefinitely.
     """
-    with open(path, "rb", 0) as file:
+    async with asyncopen(path, "rb") as file:
         print(f'I opened "{path}" to read')
         while True:
             print("I will not poll the filesystem")
@@ -60,14 +60,16 @@ async def busywork():
     while True:
         print(f"It's {datetime.now()}")
         print(f"I get other things done every {DELAY} seconds")
-        time.sleep(DELAY)
+        await asyncio.sleep(DELAY)
 
 
 async def tasks(path):
     """
     Runs coroutineread and busywork together concurrently
     """
-    await asyncio.gather(coroutineread(path), busywork())
+    async with asyncio.TaskGroup() as tg:
+        read = tg.create_task(coroutineread(path))
+        work = tg.create_task(busywork())
 
 
 if __name__ == "__main__":
