@@ -26,27 +26,31 @@ async def asyncopen(path, mode):
     """
     Asynchronously waits for a file to open, then closes it
     """
-    print(f"Opening {path}")
+    print(f'Opening "{path}"')
     file = await asyncio.to_thread(open, path, mode, encoding="utf-8")
     yield file
-    print(f"Closing {path}")
+    print(f'Closing "{path}"')
     file.close()
 
 
 async def coroutineread(path):
     """
     Asynchronously reads and prints lines as they become available
+    
+    Needs to detect when other writers close the pipe, otherwise reads
+    will stop blocking and return empty strings indefinitely.
     """
-    async with asyncopen(path, "r") as file:
+    with open(path, "rb", 0) as file:
         print(f'I opened "{path}" to read')
         while True:
             print("I will not poll the filesystem")
             print(f"It's {datetime.now()} and I'm waiting to read")
-            line = await asyncio.to_thread(file.readline)
+            bytedata = await asyncio.to_thread(file.readline)
+            line = bytedata.decode("utf-8")
             print(f'The producer wrote "{line.strip()}"')
 
 
-DELAY = 1
+DELAY = 5
 
 
 async def busywork():
@@ -63,7 +67,7 @@ async def tasks(path):
     """
     Runs coroutineread and busywork together concurrently
     """
-    asyncio.gather(coroutineread(path), busywork())
+    await asyncio.gather(coroutineread(path), busywork())
 
 
 if __name__ == "__main__":
