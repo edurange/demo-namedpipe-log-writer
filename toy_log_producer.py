@@ -12,7 +12,7 @@ Uses time.sleep() to simulate work that is CPU-bound.
 
 __author__ = "Joe Granville"
 __date__ = "20250526"
-__license__ = "GPL"
+__license__ = "MIT"
 __version__ = "0.1.0"
 __email__ = "jwgranville@gmail.com"
 __status__ = "Proof-of-concept"

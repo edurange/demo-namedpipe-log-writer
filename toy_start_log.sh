@@ -4,7 +4,7 @@
 #
 # Author: Joe Granville
 # Date: 20250526
-# License: GPL
+# License: MIT
 # Version: 0.1.0
 # Email: jwgranville@gmail.com
 # Status: Proof-of-concept
